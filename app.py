@@ -30,12 +30,6 @@ jwt = JWTManager(app)
 # Initialize SQLAlchemy database instance
 db = SQLAlchemy(app)
 
-# Define User model
-class User(db.Model):
-    user_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(1000), nullable=False)
 
 # Establish connection and execute SQL query
 engine = create_engine(os.environ["DATABASE_URL"])
@@ -43,7 +37,15 @@ conn = engine.connect()
 res = conn.execute(text("SELECT now()")).fetchall()
 print(res)
 
-    
+
+# Define User model
+class User(db.Model):
+    user_id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(1000), nullable=False)
+
+
 class Image(db.Model):
     image_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
@@ -150,6 +152,25 @@ def video():
 
     # Encode image data to base64 before passing it to the template
     encoded_images = [base64.b64encode(image.image_data).decode('ascii') for image in images]
+
+
+    # Load the audio clip
+    audio_clip = AudioFileClip("static/StarWars60.wav")
+    audio_duration = audio_clip.duration
+    
+    # Check if the audio duration is less than 60 seconds
+    if audio_duration < 60:
+        # Loop the audio clip until it reaches 60 seconds
+        num_loops = int(60 / audio_duration) + 1
+        audio_clip = audio_clip.audio_loop(n=num_loops)
+    elif audio_duration > 60:
+        # Trim the audio clip to 60 seconds
+        audio_clip = audio_clip.subclip(0, 60)
+
+    # Create video clip and add audio
+    # (Remaining code for creating the video clip goes here...)
+
+
     # Determine the selected transition effect
     transition_effect = request.form.get('transitionSelect')
     print(f"Selected transition effect: {transition_effect}")
@@ -161,7 +182,7 @@ def video():
         decoded_image = cv2.imdecode(image_data, cv2.IMREAD_COLOR)
         rgb_image = cv2.cvtColor(decoded_image, cv2.COLOR_BGR2RGB)
         height, width, _ = rgb_image.shape
-        clip = ImageClip(rgb_image, duration=3).set_position(('center', 'center'))  # Adjust duration as needed
+        clip = ImageClip(rgb_image, duration=2).set_position(('center', 'center'))  # Adjust duration as needed
 
         if transition_effect == "fade-in":
             fadein_duration = 2
@@ -208,7 +229,7 @@ def video():
         audio_clip = AudioFileClip(audio_file_path)
         final_clip = final_clip.set_audio(audio_clip)
 
-    # final_clip = final_clip.set_duration(total_duration)
+    final_clip = final_clip.set_duration(total_duration)
 
     # Specify the output video path within the static folder
     static_folder = app.static_folder
@@ -219,7 +240,7 @@ def video():
     video_path = 'static/output_video.mp4'
 
     print(f"Video created successfully at {output_video_path}.")
-    return render_template('videoPage.html', images=encoded_images, video_path=video_path)
+    return render_template('videoPage.html', images=encoded_images, x=video_path)
 
 @app.route('/admin')
 def admin():

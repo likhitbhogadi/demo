@@ -16,71 +16,103 @@
     </style>
 </head>
 
+
 <body>
     <h1>Video preview</h1>
-    <form id="videoForm" action="/video" method="post">
-        <label for="transitionSelect">Select a transition effect:</label>
-        <select id="transitionSelect" name="transitionSelect">
-            <option value="fade-in">Fade In</option>
-            <option value="fade-out">Fade Out</option>
-            <option value="crossfade-in">Cross Fade In</option>
-            <option value="crossfade-out">Crossfade Out</option>
-            <option value="fade-in-fade-out">Fade In And Out</option>
-            <option value="crossfadeinout">Cross Fade In And Out</option>
-            <option value="null">No transition</option>
-        </select>
-        <div id="audio">
-            <label for="audioSelect">Select an audio file:</label>
-            <select id="audioSelect" name="selectedAudio">
-                <option value="static/CantinaBand60.wav">Audio 1 (CantinaBand60)</option>
-                <option value="static/BabyElephantWalk60.wav">Audio 2 (BabyElephantWalk60)</option>
-                <option value="static/StarWars60.wav">Audio 3 (StarWars60)</option>
+    <center>
+
+        <form id="videoForm" action="/video" method="post">
+            <label for="transitionSelect">Select a transition effect:</label>
+            <select id="transitionSelect" name="transitionSelect">
+                <option value="fade-in">Fade In</option>
+                <option value="fade-out">Fade Out</option>
+                <option value="crossfade-in">Cross Fade In</option>
+                <option value="crossfade-out">Crossfade Out</option>
+                <option value="fade-in-fade-out">Fade In And Out</option>
+                <option value="crossfadeinout">Cross Fade In And Out</option>
+                <option value="null">No transition</option>
             </select>
-        </div>
-        <section>
-            <!-- Display images in a loop with a fade transition effect -->
-            {% for image in images %}
-            <div class="image-container">
-                <img class="fade" src="data:image/jpeg;base64,{{ image }}" alt="Image">
-                <label for="duration_{{ loop.index }}">Duration (seconds):</label>
-                <input type="number" id="duration_{{ loop.index }}" name="duration_{{ loop.index }}" min="1" value="5">
+            <br><br>
+            <div id="audio">
+                <label for="audioSelect">Select an audio file:</label>
+                <select id="audioSelect" name="selectedAudio">
+                    <option value="static/CantinaBand60.wav">Audio 1 (CantinaBand60)</option>
+                    <option value="static/BabyElephantWalk60.wav">Audio 2 (BabyElephantWalk60)</option>
+                    <option value="static/StarWars60.wav">Audio 3 (StarWars60)</option>
+                </select>
             </div>
-            {% endfor %}
-        </section>
-        <br>
-        <center>
-            <button type="button" id="createVid">Create Video</button>
-        </center>
-        <div class="button-group">
-            <button type="button" id="playBtn">Play</button>
-            <button type="button" id="pauseBtn">Pause</button>
-            <button type="button" id="rewindBtn">Rewind</button>
+            <br><br>
+            <!-- <div id="imageSelection">
+                <label>Select images to include in the video:</label><br>
+                {% for image in images %}
+                <input type="checkbox" id="image_{{ loop.index }}" name="selectedImages[]" value="{{ loop.index }}">
+                <label for="image_{{ loop.index }}">Image {{ loop.index }}</label><br>
+                {% endfor %}
+            </div> -->
+    </center>
+
+
+    <section>
+        <!-- Display images in a loop with a fade transition effect -->
+        <table>
+        {% for image in images %}
+        <div class="image-container">
+            <tr>
+            <td><img class="fade" src="data:image/jpeg;base64,{{ image }}" alt="Image"></td>
+            <td><input type="checkbox" value="Select" style="text-align: left;"></td>
+            </tr>
+            <!-- <label for="duration_{{ loop.index }}">Duration (seconds):</label> -->
+            <!-- <input type="number" id="duration_{{ loop.index }}" name="duration_{{ loop.index }}" min="1" value="5"> -->
         </div>
-        <center>
-            <video id="videoPreview" controls style="margin-top: 20px;">
-                <source src="{{ video_path }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </center>
-        <!-- Hidden input field to store the selected transition effect -->
-        <input type="hidden" id="selectedTransition" name="selectedTransition">
+        {% endfor %}
+    </table>
+    </section>
+    <br>
+    <center>
+        <button type="button" id="createVid" onclick="showVideo()">Create Video</button>
+    </center>
+    <div class="button-group">
+        <button type="button" id="playBtn">Play</button>
+        <button type="button" id="pauseBtn">Pause</button>
+        <button type="button" id="rewindBtn">Rewind</button>
+    </div>
+    <center>
+        <video id="videoPreview" controls style="margin-top: 20px;">
+            <source id="x" src="{{ x }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </center>
+    <!-- Hidden input field to store the selected transition effect -->
+    <input type="hidden" id="selectedTransition" name="selectedTransition">
     </form>
+
+    <center>
+        <a href="{{ x }}" download="output_video.mp4"><button>Download Video</button></a>
+    </center>
+
     <script>
+
+        // function showVideo()
+        // {
+        //     let vid  = document.getElementById("x")
+        //     vid.src="../static/output_video.mp4"            
+        // }
+
         var video = document.getElementById('videoPreview');
 
-        document.getElementById('playBtn').addEventListener('click', function() {
+        document.getElementById('playBtn').addEventListener('click', function () {
             video.play();
         });
 
-        document.getElementById('pauseBtn').addEventListener('click', function() {
+        document.getElementById('pauseBtn').addEventListener('click', function () {
             video.pause();
         });
 
-        document.getElementById('rewindBtn').addEventListener('click', function() {
+        document.getElementById('rewindBtn').addEventListener('click', function () {
             video.currentTime = 0;
         });
 
-        document.getElementById('createVid').addEventListener('click', function() {
+        document.getElementById('createVid').addEventListener('click', function () {
             // Get the selected transition effect
             var selectedTransition = document.getElementById('transitionSelect').value;
             console.log(selectedTransition);
