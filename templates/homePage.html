@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeamLAB Project</title>
+  <link rel="stylesheet" href="./static/homestyle.css">
+</head>
+
+<body>
+  <div class="main">
+    <div class="text">
+      <h1>Welcome {{ tempUser }}</h1>
+    </div>
+    <center>
+      <div class="form">
+        <form action="/home" method="post" enctype="multipart/form-data">
+          <table>
+            <tr>
+              <td>Upload Images</td>
+              <td>:</td>
+              <td> 
+                <div id="drop-area" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+                    <p>Drag and drop images here</p>
+                    <input type="file" id="imageUpload" name="images[]" accept="image/*" multiple onchange="handleFiles(this.files)">
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td></td>
+              <td><input style="margin-top: 20px;" type="submit" value="Upload"></td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </center>
+    {% if is_admin %}
+    <a href="/admin" class="button" style="background-color: white;">Admin Screen</a>
+    {% endif %}
+  </div>
+
+  <script>
+      function handleDragOver(event) {
+          event.preventDefault();
+          document.getElementById('drop-area').classList.add('drag-over');
+      }
+
+      function handleDrop(event) {
+          event.preventDefault();
+          document.getElementById('drop-area').classList.remove('drag-over');
+          handleFiles(event.dataTransfer.files);
+      }
+
+      function handleFiles(files) {
+          const inputElement = document.getElementById('imageUpload');
+          inputElement.files = files;
+          
+          for (const file of files) {
+              if (file.type.startsWith('image/')) {
+                  // Read the file and perform necessary actions (e.g., display, upload)
+                  const reader = new FileReader();
+                  reader.onload = function (e) {
+                      const imageElement = document.createElement('img');
+                      imageElement.src = e.target.result;
+                      document.getElementById('drop-area').appendChild(imageElement); // Append image to drop area
+                  };
+                  reader.readAsDataURL(file);
+              }
+          }
+      }
+  </script>
+</body>
+
+</html>
