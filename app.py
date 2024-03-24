@@ -23,7 +23,7 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'DefaultSecretKey')
 # Set SQLAlchemy database URI from environment variable
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'cockroachdb://likhitbhogadi:X34a6UmwvQJT8pr5f8wcdQ@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=verify-full')
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)
-
+# export DATABASE_URL="cockroachdb://likhitbhogadi:X34a6UmwvQJT8pr5f8wcdQ@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=verify-full"
 # Initialize JWT Manager
 jwt = JWTManager(app)
 
