@@ -21,9 +21,9 @@ app = Flask(__name__)
 app.static_folder = 'static'
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'DefaultSecretKey')
 # Set SQLAlchemy database URI from environment variable
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'cockroachdb://likhitbhogadi:X34a6UmwvQJT8pr5f8wcdQ@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=verify-full')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=verify-full')
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)
-# export DATABASE_URL="cockroachdb://likhitbhogadi:X34a6UmwvQJT8pr5f8wcdQ@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=verify-full"
+# export DATABASE_URL="cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=verify-full"
 # Initialize JWT Manager
 jwt = JWTManager(app)
 
@@ -37,7 +37,7 @@ db = SQLAlchemy(app)
 #         'host': 'crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud',
 #         'port': 26257,
 #         'user': 'issproject',
-#         'password': 'X34a6UmwvQJT8pr5f8wcdQ',
+#         'password': '1ge-6vxKIC_SVgYBbMf0Wg',
 #         'database': 'issproject',
 #         'sslmode': 'verify-full',
 #         'sslrootcert': './root.crt' 
@@ -58,7 +58,7 @@ def connect_to_database():
         'host': 'crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud',
         'port': 26257,
         'user': 'issproject',
-        'password': 'X34a6UmwvQJT8pr5f8wcdQ',
+        'password': '1ge-6vxKIC_SVgYBbMf0Wg',
         'database': 'issproject',
         'sslmode': 'require',  # Change sslmode to 'require'
         'sslrootcert': '/opt/render/.postgresql/root.crt'  # Update the path accordingly
