@@ -78,10 +78,10 @@ db = SQLAlchemy(app)
 # Replace placeholders with actual values
 
 engine = create_engine(
-    "cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject&sslrootcert=/opt/render/.postgresql/root.crt",
+    "cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject&sslrootcert=./root.crt",
     connect_args={"sslmode": "require"}
 )
-
+# 6vxKIC_SVgYBbMf0Wg
 # Establish connection and execute SQL query
 # engine = create_engine(os.environ["DATABASE_URL"])
 conn = engine.connect()
