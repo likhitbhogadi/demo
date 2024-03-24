@@ -74,9 +74,30 @@ db = SQLAlchemy(app)
 #         print("Error:", e)
 #         return None
 
+# def get_db_connection():
+#     # Decode the base64 certificate
+#     cert_decoded = base64.b64decode(os.environ['ROOT_CERT_BASE64'])
+
+#     # Define the path to save the certificate
+#     cert_path = '/opt/render/.postgresql/root.crt'
+#     os.makedirs(os.path.dirname(cert_path), exist_ok=True)
+
+#     # Write the certificate to the file
+#     with open(cert_path, 'wb') as cert_file:
+#         cert_file.write(cert_decoded)
+
+#     # Set up the connection string with the path to the certificate
+#     conn = psycopg2.connect(
+#         "host=stream-strider-4060.7s5.aws-ap-south-1.cockroachlabs.cloud "
+#         "port=26257 dbname=defaultdb user=akmalali59855_gmail_ "
+#         "password=J-3IiGnvZtnFfRZ1CVKh_g sslmode=verify-full "
+#         f"sslrootcert={cert_path}"
+#     )
+#     return conn
+
 # Example SQLAlchemy connection string with SSL options
 # Replace placeholders with actual values
-ssl_args={'sslrootcert': './root.crt'}
+ssl_args={'sslrootcert': 'opt/render/.postgresql/root.crt'}
 engine = create_engine(
     "cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject",
     connect_args=ssl_args
