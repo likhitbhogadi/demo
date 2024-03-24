@@ -51,34 +51,41 @@ db = SQLAlchemy(app)
 #     except psycopg2.OperationalError as e:
 #         return None
 
-from sqlalchemy import create_engine
+# from sqlalchemy import create_engine
 
-def connect_to_database():
-    conn_params = {
-        'host': 'crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud',
-        'port': 26257,
-        'user': 'issproject',
-        'password': '1ge-6vxKIC_SVgYBbMf0Wg',
-        'database': 'issproject',
-        'sslmode': 'require',  # Change sslmode to 'require'
-        'sslrootcert': '/opt/render/.postgresql/root.crt'  # Update the path accordingly
-    }
+# def connect_to_database():
+#     conn_params = {
+#         'host': 'crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud',
+#         'port': 26257,
+#         'user': 'issproject',
+#         'password': '1ge-6vxKIC_SVgYBbMf0Wg',
+#         'database': 'issproject',
+#         'sslmode': 'require',  # Change sslmode to 'require'
+#         'sslrootcert': '/opt/render/.postgresql/root.crt'  # Update the path accordingly
+#     }
 
-    conn_str = "cockroachdb://{user}:{password}@{host}:{port}/{database}?sslmode={sslmode}&sslrootcert={sslrootcert}".format(**conn_params)
+#     conn_str = "cockroachdb://{user}:{password}@{host}:{port}/{database}?sslmode={sslmode}&sslrootcert={sslrootcert}".format(**conn_params)
     
-    try:
-        engine = create_engine(conn_str)
-        conn = engine.connect()
-        return conn
-    except Exception as e:
-        print("Error:", e)
-        return None
+#     try:
+#         engine = create_engine(conn_str)
+#         conn = engine.connect()
+#         return conn
+#     except Exception as e:
+#         print("Error:", e)
+#         return None
 
+# Example SQLAlchemy connection string with SSL options
+# Replace placeholders with actual values
+
+engine = create_engine(
+    "cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject&sslrootcert=/opt/render/.postgresql/root.crt",
+    connect_args={"sslmode": "require"}
+)
 
 # Establish connection and execute SQL query
 # engine = create_engine(os.environ["DATABASE_URL"])
-# conn = engine.connect()
-conn=connect_to_database()
+conn = engine.connect()
+# conn=connect_to_database()
 res = conn.execute(text("SELECT now()")).fetchall()
 print(res)
 
