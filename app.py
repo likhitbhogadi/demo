@@ -30,7 +30,28 @@ jwt = JWTManager(app)
 # Initialize SQLAlchemy database instance
 db = SQLAlchemy(app)
 
-import psycopg2
+# import psycopg2
+
+# def connect_to_database():
+#     conn_params = {
+#         'host': 'crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud',
+#         'port': 26257,
+#         'user': 'issproject',
+#         'password': 'X34a6UmwvQJT8pr5f8wcdQ',
+#         'database': 'issproject',
+#         'sslmode': 'verify-full',
+#         'sslrootcert': './root.crt' 
+#     }
+
+#     conn_str = "host={host} port={port} user={user} password={password} dbname={database} sslmode={sslmode} sslrootcert={sslrootcert}".format(**conn_params)
+    
+#     try:
+#         conn = psycopg2.connect(conn_str)
+#         return conn
+#     except psycopg2.OperationalError as e:
+#         return None
+
+from sqlalchemy import create_engine
 
 def connect_to_database():
     conn_params = {
@@ -39,17 +60,20 @@ def connect_to_database():
         'user': 'issproject',
         'password': 'X34a6UmwvQJT8pr5f8wcdQ',
         'database': 'issproject',
-        'sslmode': 'verify-full',
-        'sslrootcert': './root.crt' 
+        'sslmode': 'require',  # Change sslmode to 'require'
+        'sslrootcert': '/opt/render/.postgresql/root.crt'  # Update the path accordingly
     }
 
-    conn_str = "host={host} port={port} user={user} password={password} dbname={database} sslmode={sslmode} sslrootcert={sslrootcert}".format(**conn_params)
+    conn_str = "cockroachdb://{user}:{password}@{host}:{port}/{database}?sslmode={sslmode}&sslrootcert={sslrootcert}".format(**conn_params)
     
     try:
-        conn = psycopg2.connect(conn_str)
+        engine = create_engine(conn_str)
+        conn = engine.connect()
         return conn
-    except psycopg2.OperationalError as e:
+    except Exception as e:
+        print("Error:", e)
         return None
+
 
 # Establish connection and execute SQL query
 # engine = create_engine(os.environ["DATABASE_URL"])
