@@ -76,9 +76,10 @@ db = SQLAlchemy(app)
 
 # Example SQLAlchemy connection string with SSL options
 # Replace placeholders with actual values
-
+ssl_args={'sslrootcert': './root.crt'}
 engine = create_engine(
-    "cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=require&sslrootcert=./root.crt",
+    "cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject",
+    connect_args=ssl_args
 )
 
 # 6vxKIC_SVgYBbMf0Wg
