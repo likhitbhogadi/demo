@@ -30,10 +30,31 @@ jwt = JWTManager(app)
 # Initialize SQLAlchemy database instance
 db = SQLAlchemy(app)
 
+import psycopg2
+
+def connect_to_database():
+    conn_params = {
+        'host': 'crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud',
+        'port': 26257,
+        'user': 'issproject',
+        'password': 'X34a6UmwvQJT8pr5f8wcdQ',
+        'database': 'issproject',
+        'sslmode': 'verify-full',
+        'sslrootcert': './root.crt' 
+    }
+
+    conn_str = "host={host} port={port} user={user} password={password} dbname={database} sslmode={sslmode} sslrootcert={sslrootcert}".format(**conn_params)
+    
+    try:
+        conn = psycopg2.connect(conn_str)
+        return conn
+    except psycopg2.OperationalError as e:
+        return None
 
 # Establish connection and execute SQL query
-engine = create_engine(os.environ["DATABASE_URL"])
-conn = engine.connect()
+# engine = create_engine(os.environ["DATABASE_URL"])
+# conn = engine.connect()
+conn=connect_to_database()
 res = conn.execute(text("SELECT now()")).fetchall()
 print(res)
 
