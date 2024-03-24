@@ -95,21 +95,48 @@ db = SQLAlchemy(app)
 #     )
 #     return conn
 
-# Example SQLAlchemy connection string with SSL options
-# Replace placeholders with actual values
-ssl_args={'sslrootcert': 'opt/render/.postgresql/root.crt'}
+# # Example SQLAlchemy connection string with SSL options
+# # Replace placeholders with actual values
+# ssl_args={'sslrootcert': './root.crt'}
+# engine = create_engine(
+#     "cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject",
+#     connect_args=ssl_args
+# )
+
+# # 6vxKIC_SVgYBbMf0Wg
+# # Establish connection and execute SQL query
+# # engine = create_engine(os.environ["DATABASE_URL"])
+# conn = engine.connect()
+# # conn=connect_to_database()
+# res = conn.execute(text("SELECT now()")).fetchall()
+# print(res)
+
+from sqlalchemy import create_engine
+import logging
+
+# Enable SQLAlchemy logging
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+
+ssl_args = {'sslrootcert': './root.crt'}
 engine = create_engine(
     "cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject",
     connect_args=ssl_args
 )
 
-# 6vxKIC_SVgYBbMf0Wg
-# Establish connection and execute SQL query
-# engine = create_engine(os.environ["DATABASE_URL"])
-conn = engine.connect()
-# conn=connect_to_database()
-res = conn.execute(text("SELECT now()")).fetchall()
-print(res)
+try:
+    # Attempt to establish a connection
+    conn = engine.connect()
+    print("Connection established successfully.")
+    # Perform database operations here if needed
+except Exception as e:
+    print("Error:", e)
+    # Handle connection errors here
+finally:
+    # Close the connection if it was opened
+    if 'conn' in locals():
+        conn.close()
+
 
 
 # Define User model
