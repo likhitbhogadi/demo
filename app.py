@@ -21,122 +21,21 @@ app = Flask(__name__)
 app.static_folder = 'static'
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'DefaultSecretKey')
 # Set SQLAlchemy database URI from environment variable
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=verify-full')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=verify-full&sslrootcert=system')
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)
-# export DATABASE_URL="cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=verify-full"
+
 # Initialize JWT Manager
 jwt = JWTManager(app)
 
 # Initialize SQLAlchemy database instance
 db = SQLAlchemy(app)
 
-# import psycopg2
 
-# def connect_to_database():
-#     conn_params = {
-#         'host': 'crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud',
-#         'port': 26257,
-#         'user': 'issproject',
-#         'password': '1ge-6vxKIC_SVgYBbMf0Wg',
-#         'database': 'issproject',
-#         'sslmode': 'verify-full',
-#         'sslrootcert': './root.crt' 
-#     }
-
-#     conn_str = "host={host} port={port} user={user} password={password} dbname={database} sslmode={sslmode} sslrootcert={sslrootcert}".format(**conn_params)
-    
-#     try:
-#         conn = psycopg2.connect(conn_str)
-#         return conn
-#     except psycopg2.OperationalError as e:
-#         return None
-
-# from sqlalchemy import create_engine
-
-# def connect_to_database():
-#     conn_params = {
-#         'host': 'crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud',
-#         'port': 26257,
-#         'user': 'issproject',
-#         'password': '1ge-6vxKIC_SVgYBbMf0Wg',
-#         'database': 'issproject',
-#         'sslmode': 'require',  # Change sslmode to 'require'
-#         'sslrootcert': '/opt/render/.postgresql/root.crt'  # Update the path accordingly
-#     }
-
-#     conn_str = "cockroachdb://{user}:{password}@{host}:{port}/{database}?sslmode={sslmode}&sslrootcert={sslrootcert}".format(**conn_params)
-    
-#     try:
-#         engine = create_engine(conn_str)
-#         conn = engine.connect()
-#         return conn
-#     except Exception as e:
-#         print("Error:", e)
-#         return None
-
-# def get_db_connection():
-#     # Decode the base64 certificate
-#     cert_decoded = base64.b64decode(os.environ['ROOT_CERT_BASE64'])
-
-#     # Define the path to save the certificate
-#     cert_path = '/opt/render/.postgresql/root.crt'
-#     os.makedirs(os.path.dirname(cert_path), exist_ok=True)
-
-#     # Write the certificate to the file
-#     with open(cert_path, 'wb') as cert_file:
-#         cert_file.write(cert_decoded)
-
-#     # Set up the connection string with the path to the certificate
-#     conn = psycopg2.connect(
-#         "host=stream-strider-4060.7s5.aws-ap-south-1.cockroachlabs.cloud "
-#         "port=26257 dbname=defaultdb user=akmalali59855_gmail_ "
-#         "password=J-3IiGnvZtnFfRZ1CVKh_g sslmode=verify-full "
-#         f"sslrootcert={cert_path}"
-#     )
-#     return conn
-
-# # Example SQLAlchemy connection string with SSL options
-# # Replace placeholders with actual values
-# ssl_args={'sslrootcert': './root.crt'}
-# engine = create_engine(
-#     "cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject",
-#     connect_args=ssl_args
-# )
-
-# # 6vxKIC_SVgYBbMf0Wg
-# # Establish connection and execute SQL query
-# # engine = create_engine(os.environ["DATABASE_URL"])
-# conn = engine.connect()
-# # conn=connect_to_database()
-# res = conn.execute(text("SELECT now()")).fetchall()
-# print(res)
-
-from sqlalchemy import create_engine
-import logging
-
-# Enable SQLAlchemy logging
-logging.basicConfig()
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-
-ssl_args = {'sslrootcert': './root.crt'}
-engine = create_engine(
-    "cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject",
-    connect_args=ssl_args
-)
-
-try:
-    # Attempt to establish a connection
-    conn = engine.connect()
-    print("Connection established successfully.")
-    # Perform database operations here if needed
-except Exception as e:
-    print("Error:", e)
-    # Handle connection errors here
-finally:
-    # Close the connection if it was opened
-    if 'conn' in locals():
-        conn.close()
-
+# Establish connection and execute SQL query
+engine = create_engine(os.environ["DATABASE_URL"])
+conn = engine.connect()
+res = conn.execute(text("SELECT now()")).fetchall()
+print(res)
 
 
 # Define User model
