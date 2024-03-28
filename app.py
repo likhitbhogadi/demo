@@ -155,17 +155,17 @@ def video():
 
 
     # Load the audio clip
-    audio_clip = AudioFileClip("static/StarWars60.wav")
-    audio_duration = audio_clip.duration
+    # audio_clip = AudioFileClip("static/StarWars60.wav")
+    # audio_duration = audio_clip.duration
     
-    # Check if the audio duration is less than 60 seconds
-    if audio_duration < 60:
-        # Loop the audio clip until it reaches 60 seconds
-        num_loops = int(60 / audio_duration) + 1
-        audio_clip = audio_clip.audio_loop(n=num_loops)
-    elif audio_duration > 60:
-        # Trim the audio clip to 60 seconds
-        audio_clip = audio_clip.subclip(0, 60)
+    # # Check if the audio duration is less than 60 seconds
+    # if audio_duration < 60:
+    #     # Loop the audio clip until it reaches 60 seconds
+    #     num_loops = int(60 / audio_duration) + 1
+    #     audio_clip = audio_clip.audio_loop(n=num_loops)
+    # elif audio_duration > 60:
+    #     # Trim the audio clip to 60 seconds
+    #     audio_clip = audio_clip.subclip(0, 60)
 
     # Create video clip and add audio
     # (Remaining code for creating the video clip goes here...)
