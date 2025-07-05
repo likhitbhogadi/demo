@@ -1,42 +1,34 @@
-from flask import Flask, render_template, request, redirect, session, send_from_directory
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required, decode_token
-import datetime
-import numpy as np
-import cv2
-from moviepy.editor import ImageSequenceClip
 import os
-from flask import jsonify
-from moviepy.editor import ImageClip, concatenate_videoclips,AudioFileClip
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from sqlalchemy import create_engine
-
-import os
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
-from sqlalchemy import create_engine, text
+from sqlalchemy_cockroachdb import run_transaction
+from datetime import datetime
+import cv2
+import numpy as np
+from moviepy.editor import VideoFileClip
+import requests
 
 # Initialize Flask app
 app = Flask(__name__)
 app.static_folder = 'static'
-app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'DefaultSecretKey')
-# Set SQLAlchemy database URI from environment variable
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'cockroachdb://likhitbhogadi:1ge-6vxKIC_SVgYBbMf0Wg@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/issproject?sslmode=verify-full&sslrootcert=system')
-app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', True)
 
-# Initialize JWT Manager
+# Use environment variables
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
+app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
+
+# Initialize extensions
+db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
-# Initialize SQLAlchemy database instance
-db = SQLAlchemy(app)
-
-
-# Establish connection and execute SQL query
-engine = create_engine(os.environ["DATABASE_URL"])
-conn = engine.connect()
-res = conn.execute(text("SELECT now()")).fetchall()
-print(res)
-
+# Create engine with environment variable
+if os.environ.get('DATABASE_URL'):
+    engine = create_engine(os.environ.get('DATABASE_URL'))
+else:
+    raise ValueError("DATABASE_URL environment variable not set")
 
 # Define User model
 class User(db.Model):
@@ -134,13 +126,9 @@ def home():
             return render_template('homePage.html', message='No images uploaded')
     return render_template('homePage.html', tempUser=tempUser,is_admin=is_admin)
 
-# from flask import render_template, redirect, request, session
-# from your_flask_app import app, db  # Replace 'your_flask_app' with the actual name of your Flask app
-# from models import image  # Assuming Image is the SQLAlchemy model for your images
-
 import base64
 
-from moviepy.editor import ImageClip, concatenate_videoclips
+from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip
 import numpy as np
 @app.route('/video', methods=['GET', 'POST'])
 def video():
@@ -155,17 +143,17 @@ def video():
 
 
     # Load the audio clip
-    # audio_clip = AudioFileClip("static/StarWars60.wav")
-    # audio_duration = audio_clip.duration
+    audio_clip = AudioFileClip("static/StarWars60.wav")
+    audio_duration = audio_clip.duration
     
-    # # Check if the audio duration is less than 60 seconds
-    # if audio_duration < 60:
-    #     # Loop the audio clip until it reaches 60 seconds
-    #     num_loops = int(60 / audio_duration) + 1
-    #     audio_clip = audio_clip.audio_loop(n=num_loops)
-    # elif audio_duration > 60:
-    #     # Trim the audio clip to 60 seconds
-    #     audio_clip = audio_clip.subclip(0, 60)
+    # Check if the audio duration is less than 60 seconds
+    if audio_duration < 60:
+        # Loop the audio clip until it reaches 60 seconds
+        num_loops = int(60 / audio_duration) + 1
+        audio_clip = audio_clip.audio_loop(n=num_loops)
+    elif audio_duration > 60:
+        # Trim the audio clip to 60 seconds
+        audio_clip = audio_clip.subclip(0, 60)
 
     # Create video clip and add audio
     # (Remaining code for creating the video clip goes here...)
@@ -253,11 +241,10 @@ def admin():
             return render_template('adminPage.html', username=user.username, users=users)
     
     return redirect('/home')
-# @app.route('/video', methods=['GET', 'POST'])
-# def vedio():
-#     return render_template('videoPage.html')
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True,port="5038")
+    # Updated for production deployment
+    port = int(os.environ.get('PORT', 5038))
+    app.run(host='0.0.0.0', port=port, debug=os.environ.get('FLASK_DEBUG', 'False') == 'True')

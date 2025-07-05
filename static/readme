@@ -1,1 +1,6 @@
 
+postgresql://likhitbhogadi:<ENTER-SQL-USER-PASSWORD>@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full
+
+postgresql://likhitbhogadi:Fh9CguX9GejDJ0t_R78rSw@crawly-ewe-9007.8nk.gcp-asia-southeast1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full
+
+Fh9CguX9GejDJ0t_R78rSw8f5f6e281c892d3926d14488f524542a

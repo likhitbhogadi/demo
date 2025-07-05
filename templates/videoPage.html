@@ -16,6 +16,7 @@
     </style>
 </head>
 
+
 <body>
     <h1>Video preview</h1>
     <center>
@@ -50,6 +51,7 @@
             </div> -->
     </center>
 
+
     <section>
         <!-- Display images in a loop with a fade transition effect -->
         <table>
@@ -76,7 +78,7 @@
     </div>
     <center>
         <video id="videoPreview" controls style="margin-top: 20px;">
-            <source id="x" src="../static/output_video.mp4" type="video/mp4">
+            <source id="x" src="{{ x }}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
     </center>
@@ -85,7 +87,7 @@
     </form>
 
     <center>
-        <a href="{{ video_path }}" download="output_video.mp4"><button>Download Video</button></a>
+        <a href="{{ x }}" download="output_video.mp4"><button>Download Video</button></a>
     </center>
 
     <script>
