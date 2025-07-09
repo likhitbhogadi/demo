@@ -16,17 +16,18 @@
         <form id="loginForm" action="#" method="POST">
             <input type="text" name="username" placeholder="Username" required autocomplete="off">
             <div class="eye-pass">
-                <input type="password" name="password" id="passwordInput" placeholder="Password" required autocomplete="off">
+                <input type="password" name="password" id="passwordInput" placeholder="Password" required
+                    autocomplete="off">
                 <button type="button" class="eye-button" id="togglePasswordButton" onclick="togglePassword()"></button>
             </div>
-            <button type="submit" >Login</button>
+            <button type="submit">Login</button>
             <p style="color:red;">{{ message }}</p>
         </form>
         <div class="links">
             <a href="/signup">Don't have an account? Sign Up</a>
             <!-- <a href="#forgot">Forgot Password</a> -->
         </div>
-        <div id="loginMessage"></div> 
+        <div id="loginMessage"></div>
     </div>
 
     <div class="container" id="signup" style="display: none;">

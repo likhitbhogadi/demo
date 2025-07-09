@@ -13,11 +13,37 @@
             justify-content: center;
             gap: 10px;
         }
+        .navigation-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: var(--color2);
+            color: var(--color1);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .nav-btn:hover {
+            background-color: var(--color3);
+            color: white;
+        }
     </style>
 </head>
 
-
 <body>
+    <!-- Navigation buttons -->
+    <div class="navigation-buttons">
+        <a href="/home" class="nav-btn">Home</a>
+        <a href="/logout" class="nav-btn">Logout</a>
+    </div>
+
     <h1>Video preview</h1>
     <center>
 
@@ -55,17 +81,17 @@
     <section>
         <!-- Display images in a loop with a fade transition effect -->
         <table>
-        {% for image in images %}
-        <div class="image-container">
-            <tr>
-            <td><img class="fade" src="data:image/jpeg;base64,{{ image }}" alt="Image"></td>
-            <td><input type="checkbox" value="Select" style="text-align: left;"></td>
-            </tr>
-            <!-- <label for="duration_{{ loop.index }}">Duration (seconds):</label> -->
-            <!-- <input type="number" id="duration_{{ loop.index }}" name="duration_{{ loop.index }}" min="1" value="5"> -->
-        </div>
-        {% endfor %}
-    </table>
+            {% for image in images %}
+            <div class="image-container">
+                <tr>
+                    <td><img class="fade" src="data:image/jpeg;base64,{{ image }}" alt="Image"></td>
+                    <td><input type="checkbox" value="Select" style="text-align: left;"></td>
+                </tr>
+                <!-- <label for="duration_{{ loop.index }}">Duration (seconds):</label> -->
+                <!-- <input type="number" id="duration_{{ loop.index }}" name="duration_{{ loop.index }}" min="1" value="5"> -->
+            </div>
+            {% endfor %}
+        </table>
     </section>
     <br>
     <center>

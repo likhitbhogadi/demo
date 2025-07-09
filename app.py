@@ -1,23 +1,37 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+from flask import Flask, render_template, request, redirect, session, current_app
+# from flask import url_for, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token
+# from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import create_engine
-from sqlalchemy_cockroachdb import run_transaction
+# from sqlalchemy_cockroachdb import run_transaction
 from datetime import datetime
 import cv2
 import numpy as np
-from moviepy.editor import VideoFileClip
-import requests
+# from moviepy.editor import VideoFileClip
+# import requests
+from dotenv import load_dotenv
+import jwt
+import base64
+from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip
+import numpy as np
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+
+# load variables from .env into os.environ
+load_dotenv()  
 
 # Initialize Flask app
 app = Flask(__name__)
 app.static_folder = 'static'
 
 # Use environment variables
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
+# app.config is a dictionary-like object in Flask used to store configuration variables.
+# app.config['SOME_KEY'] = value assigns a value to a configuration key.
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
 
 # Initialize extensions
@@ -31,19 +45,57 @@ else:
     raise ValueError("DATABASE_URL environment variable not set")
 
 # Define User model
+# model-1
 class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(1000), nullable=False)
+    password = db.Column(db.String(256), nullable=False)
 
-
+# model-2
 class Image(db.Model):
     image_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     filename = db.Column(db.String(255), nullable=False)
     image_data = db.Column(db.BLOB, nullable=False)  # This line should match the column in your database
 
+# function-1
+def decode_token(token):
+    """
+    Decode JWT token and return the payload
+    """
+    try:
+        # Decode the JWT token using the app's secret key
+        payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+        return payload
+    except jwt.ExpiredSignatureError:
+        return None
+    except jwt.InvalidTokenError:
+        return None
+
+# function-2
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect('/')
+        return f(*args, **kwargs)
+    return decorated_function
+
+# function-3
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect('/')
+        user_id = session['user_id']
+        user = User.query.get(user_id)
+        if not user or user.username != 'admin':
+            return redirect('/home')
+        return f(*args, **kwargs)
+    return decorated_function
+
+# route-1
 @app.route('/', methods=['GET', 'POST'])
 def landing_and_login_page():
 
@@ -55,12 +107,9 @@ def landing_and_login_page():
 
         if user:
             stored_password = user.password
-            decoded_token = decode_token(stored_password)
-            decoded_password = decoded_token['sub']
-            if password == decoded_password:
+            if check_password_hash(stored_password, password):
                 session['user_id'] = user.user_id
-                global tempUser
-                tempUser=username
+                session['username'] = username
                 if 'users' not in session:
                     session['users'] = []
                 if username not in session['users']:
@@ -71,11 +120,12 @@ def landing_and_login_page():
 
     return render_template('landing&loginPage.html')
 
+# route-2
 # Route for signup page
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form['username'].strip().lower()
         email = request.form['email']
         password = request.form['password']
 
@@ -84,11 +134,11 @@ def signup():
         if existing_user:
             return render_template('signupPage.html', message='Username already exists')
 
-        password_token = create_access_token(identity=password, expires_delta=datetime.timedelta(days=30))  # Expires in 1 day
+        # Hash the password securely
+        hashed_password = generate_password_hash(password)
 
         try:
-            # new_image = Image(imge)
-            new_user = User(username=username, email=email, password=password_token)
+            new_user = User(username=username, email=email, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
         except Exception as e:
@@ -96,43 +146,46 @@ def signup():
             return render_template('signupPage.html', message='Error occurred while creating user')
 
         session['user_id'] = new_user.user_id
+        session['username'] = username
         return redirect('/')
 
     return render_template('signupPage.html')
 
+# route-3
 @app.route('/home', methods=['GET', 'POST'])
+@login_required
 def home():
+    # Get username from session
+    username = session.get('username')
     is_admin = False
-
-    if 'user_id' in session:
-        user_id = session['user_id']
-        user = User.query.get(user_id)
-        if user:
-            is_admin = user.username == 'admin'
+    
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    if user:
+        is_admin = user.username == 'admin'
+        username = user.username
+    
     if request.method == 'POST':
-        user_id = session.get('user_id')
         if 'images[]' in request.files:
             images = request.files.getlist('images[]')
             for image in images:
                 if image:
                     filename = image.filename
-                    image_data = image.read()  # Read the binary data of the image
+                    image_data = image.read()
                     new_image = Image(user_id=user_id, filename=filename, image_data=image_data)
                     db.session.add(new_image)
                     db.session.commit()
             return redirect('/video')
         else:
-            # Handle case when no images are uploaded
             return render_template('homePage.html', message='No images uploaded')
-    return render_template('homePage.html', tempUser=tempUser,is_admin=is_admin)
+    
+    return render_template('homePage.html', tempUser=username, is_admin=is_admin)
 
-import base64
-
-from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip
-import numpy as np
+#route-4
 @app.route('/video', methods=['GET', 'POST'])
+@login_required
 def video():
-    user_id = session.get('user_id')
+    user_id = session['user_id']
     images = Image.query.filter_by(user_id=user_id).all()
     print(f"no.of images: {len(images)}")
     if not images:
@@ -140,7 +193,6 @@ def video():
 
     # Encode image data to base64 before passing it to the template
     encoded_images = [base64.b64encode(image.image_data).decode('ascii') for image in images]
-
 
     # Load the audio clip
     audio_clip = AudioFileClip("static/StarWars60.wav")
@@ -157,7 +209,6 @@ def video():
 
     # Create video clip and add audio
     # (Remaining code for creating the video clip goes here...)
-
 
     # Determine the selected transition effect
     transition_effect = request.form.get('transitionSelect')
@@ -230,21 +281,34 @@ def video():
     print(f"Video created successfully at {output_video_path}.")
     return render_template('videoPage.html', images=encoded_images, x=video_path)
 
+#route-5
 @app.route('/admin')
+@admin_required
 def admin():
-    if 'user_id' in session:
-        user_id = session['user_id']
-        user = User.query.get(user_id)
-        if user and user.username == 'admin':
-            users = session.get('users', [])
-            print("Current users:", users)  # Print the current users for debugging
-            return render_template('adminPage.html', username=user.username, users=users)
-    
-    return redirect('/home')
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    users = session.get('users', [])
+    print("Current users:", users)
+    return render_template('adminPage.html', username=user.username, users=users)
 
+# route-6
+# Add a logout route to clear session data
+@app.route('/logout')
+@login_required
+def logout():
+    session.clear()
+    return redirect('/')
+
+# main function
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     # Updated for production deployment
     port = int(os.environ.get('PORT', 5038))
     app.run(host='0.0.0.0', port=port, debug=os.environ.get('FLASK_DEBUG', 'False') == 'True')
+
+
+
+
+
+
