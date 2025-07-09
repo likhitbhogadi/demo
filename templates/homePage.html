@@ -8,26 +8,28 @@
   <link rel="stylesheet" href="./static/homestyle.css">
   <style>
     .navigation-buttons {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        .nav-btn {
-            padding: 10px 20px;
-            background-color: var(--color2);
-            color: var(--color1);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        .nav-btn:hover {
-            background-color: var(--color3);
-            color: white;
-        }
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      background-color: var(--color2);
+      color: var(--color1);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .nav-btn:hover {
+      background-color: var(--color3);
+      color: white;
+    }
   </style>
 </head>
 
@@ -49,45 +51,34 @@
     <center>
       <div class="form">
         <form action="/home" method="post" enctype="multipart/form-data">
-          <table>
-            <div id="audio">
-              <label for="audioSelect">Select an audio file:</label>
+          <label for="audioSelect">Select an audio file:</label>
+          <select id="audioSelect" name="selectedAudio" onchange="changeAudio()">
+            <option value="static/CantinaBand60.wav">Audio 1 (CantinaBand60)</option>
+            <option value="static/BabyElephantWalk60.wav">Audio 2 (BabyElephantWalk60)</option>
+            <option value="static/StarWars60.wav">Audio 3 (StarWars60)</option>
+          </select>
+          <audio controls id="audioPlayer"></audio>
 
-              <select id="audioSelect" onchange="changeAudio()">
-                <option value="static/CantinaBand60.wav">Audio 1 (CantinaBand60)</option>
-                <option value="static/BabyElephantWalk60.wav">Audio 2 (BabyElephantWalk60)</option>
-                <option value="static/StarWars60.wav">Audio 3 (StarWars60)</option>
-              </select>
+          <label for="transitionSelect">Choose transition effect:</label>
+          <select id="transitionSelect" name="transitionSelect">
+            <option value="fade-in">Fade In</option>
+            <option value="fade-out">Fade Out</option>
+            <option value="crossfade-in">Crossfade In</option>
+            <option value="crossfade-out">Crossfade Out</option>
+            <option value="fade-in-fade-out">Fade In & Fade Out</option>
+            <option value="crossfadeinout">Crossfade In+Out</option>
+            <option value="null">None</option>
+          </select>
 
-              <audio controls id="audioPlayer">
-                <!-- The selected audio source will be dynamically set here -->
-                Your browser does not support the audio tag.
-              </audio>
-            </div>
-            <tr style="padding-bottom: 1%;">
-              <td>Upload Images</td>
-              <td>:</td>
-              <td>
-                <!-- <input type="file" name="images[]" id="imageUpload" accept="image/*" multiple> -->
-                <div id="drop-area" ondrop="handleDrop(event)" ondragover="handleDragOver(event)"
-                  style="padding-top:2.5%; padding-bottom: 2.5%;">
-                  <p>Drag and drop images here</p>
-                  <input type="file" id="imageUpload" name="images[]" accept="image/*" multiple
-                    onchange="handleFiles(this.files)">
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td></td>
-              <td></td>
-
-            </tr>
-          </table>
-          <div id="upload-btn">
-            <td><input style="margin-top: 50px;" type="submit" onclick="preview()" value="Upload"></td>
+          <div id="drop-area" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+            <p>Drag and drop images here</p>
+            <input type="file" id="imageUpload" name="images[]" accept="image/*" multiple
+              onchange="handleFiles(this.files)">
           </div>
+
+          <input style="margin-top: 50px;" type="submit" value="Upload">
         </form>
+
       </div>
     </center>
 

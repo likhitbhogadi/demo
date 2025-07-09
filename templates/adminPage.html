@@ -48,10 +48,10 @@
             <br>
             <p>This is the admin screen.</p>
             <h2>Users:</h2>
-            
-                {% for user in session['users'] %}
-                {{ user }}<br>
-                {% endfor %}
+
+            {% for user in session['users'] %}
+            {{ user }}<br>
+            {% endfor %}
             <a href="/home">Back to Home</a>
         </center>
     </div>
